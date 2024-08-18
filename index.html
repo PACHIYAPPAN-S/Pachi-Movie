@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie Finder</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column;
+        }
+
+        .container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 350px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        input[type="text"] {
+            width: 80%;
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            margin-bottom: 10px;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            background-color: #5cb85c;
+            color: #fff;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: #4cae4c;
+        }
+
+        .movie-details {
+            margin-top: 20px;
+            text-align: left;
+        }
+
+        .movie-details img {
+            max-width: 100%;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+
+        .movie-details h2 {
+            margin: 10px 0;
+            font-size: 20px;
+            color: #333;
+        }
+
+        .movie-details p {
+            margin: 5px 0;
+            color: #666;
+        }
+
+        #loading {
+            display: none;
+            margin-top: 20px;
+        }
+
+        .footer {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 12px;
+            color: #777;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Movie Finder</h1>
+        <input type="text" id="movieInput" placeholder="Enter movie title...">
+        <button id="searchButton">Search</button>
+        <div id="loading">Loading...</div>
+        <div id="movieDetails" class="movie-details">
+            <!-- Movie details will be displayed here -->
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>&copy; 2024 Pachis Time. All rights reserved.</p>
+    </div>
+
+    <script defer>
+        // Your API key
+        const apiKey = 'f0ad149d';
+
+        // DOM elements
+        const movieInput = document.getElementById('movieInput');
+        const searchButton = document.getElementById('searchButton');
+        const movieDetails = document.getElementById('movieDetails');
+        const loading = document.getElementById('loading');
+
+        // Event listener for the search button
+        searchButton.addEventListener('click', () => {
+            const movieTitle = movieInput.value.trim();
+            if (movieTitle) {
+                fetchMovieData(movieTitle);
+            }
+        });
+
+        // Function to fetch movie data from OMDb API
+        function fetchMovieData(title) {
+            loading.style.display = 'block';
+            movieDetails.innerHTML = '';
+
+            const url =`https://www.omdbapi.com/?apikey=${apiKey}&t=${encodeURIComponent(title)}`;
+
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    setTimeout(() => {
+                        loading.style.display = 'none';
+                        if (data.Response === "True") {
+                            displayMovieData(data);
+                        } else {
+                            movieDetails.innerHTML = '<p>Movie not found!</p>';
+                        }
+                    }, 2000); // 2-second delay
+                })
+                .catch(error => {
+                    loading.style.display = 'none';
+                    console.error('Error fetching data:', error);
+                    movieDetails.innerHTML = '<p>Something went wrong. Please try again later.</p>';
+                });
+        }
+
+        // Function to display movie data in the DOM
+        function displayMovieData(data) {
+            movieDetails.innerHTML = `
+                <img src="${data.Poster}" alt="${data.Title} Poster">
+                <h2>${data.Title} (${data.Year})</h2>
+                <p><strong>Genre:</strong> ${data.Genre}</p>
+                <p><strong>Director:</strong> ${data.Director}</p>
+                <p><strong>Actors:</strong> ${data.Actors}</p>
+                <p><strong>Plot:</strong> ${data.Plot}</p>
+                <p><strong>IMDb Rating:</strong> ${data.imdbRating}</p>
+            `;
+        }
+    </script>
+</body>
+
+</html>
